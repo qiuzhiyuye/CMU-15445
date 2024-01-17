@@ -67,9 +67,13 @@ class Page {
   inline void SetLSN(lsn_t lsn) { memcpy(GetData() + OFFSET_LSN, &lsn, sizeof(lsn_t)); }
 
  protected:
+
+  // 静态断言，编译时期就断言，这样直接报编译错误，强制做一些约定
+  //在这里就是page_id_t 强制设置为32bit，避免出问题
   static_assert(sizeof(page_id_t) == 4);
   static_assert(sizeof(lsn_t) == 4);
 
+  // size_t 一般就是uint 只是宏定义了一下
   static constexpr size_t SIZE_PAGE_HEADER = 8;
   static constexpr size_t OFFSET_PAGE_START = 0;
   static constexpr size_t OFFSET_LSN = 4;
@@ -77,6 +81,8 @@ class Page {
  private:
   /** Zeroes out the data that is held within the page. */
   inline void ResetMemory() { memset(data_, OFFSET_PAGE_START, BUSTUB_PAGE_SIZE); }
+
+  // 这里的页大小 配置文件里面是 4096 4KB ，用memset置空内存实现清空一个页
 
   /** The actual data that is stored within a page. */
   char data_[BUSTUB_PAGE_SIZE]{};

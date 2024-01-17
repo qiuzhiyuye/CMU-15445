@@ -48,4 +48,4 @@ class ReaderWriterLatch {
   std::shared_mutex mutex_;
 };
 
-}  // namespace bustubs
+}  // namespace bustub

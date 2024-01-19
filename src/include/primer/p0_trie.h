@@ -386,12 +386,12 @@ class Trie {
       // 既然 unique不能复制一份，那就和 前面处理p指向root_一样，
       // &取(*p)对象的实体
       // unique pushback到容器之后是复制一份的，不需要上面三行操作
-      // 应该是pb操作自动复制一份指针 
+      // 应该是pb操作自动复制一份指针
       v.push_back(p);
       // 个人感觉这里关系是unique_ptr<A> 可以看成单一个A类型
       // 只不过嵌套了智能指针，做到RAII
       // uniqueptr<A> *p 可以看成原来的 A *p
-      //*p= &对象
+      // *p= &对象
     }
     latch_.RUnlock();
     latch_.WLock();

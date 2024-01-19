@@ -61,15 +61,15 @@ class Page {
   inline void RUnlatch() { rwlatch_.RUnlock(); }
 
   /** @return the page LSN. */
+  // log sequence number  --> LSN
   inline auto GetLSN() -> lsn_t { return *reinterpret_cast<lsn_t *>(GetData() + OFFSET_LSN); }
 
   /** Sets the page LSN. */
   inline void SetLSN(lsn_t lsn) { memcpy(GetData() + OFFSET_LSN, &lsn, sizeof(lsn_t)); }
 
  protected:
-
   // 静态断言，编译时期就断言，这样直接报编译错误，强制做一些约定
-  //在这里就是page_id_t 强制设置为32bit，避免出问题
+  // 在这里就是page_id_t 强制设置为32bit，int32_t,避免出问题
   static_assert(sizeof(page_id_t) == 4);
   static_assert(sizeof(lsn_t) == 4);
 
@@ -87,12 +87,15 @@ class Page {
   /** The actual data that is stored within a page. */
   char data_[BUSTUB_PAGE_SIZE]{};
   /** The ID of this page. */
+  // 页面无效的是时候的id号码值
   page_id_t page_id_ = INVALID_PAGE_ID;
   /** The pin count of this page. */
   int pin_count_ = 0;
   /** True if the page is dirty, i.e. it is different from its corresponding page on disk. */
+  // 脏位
   bool is_dirty_ = false;
   /** Page latch. */
+  // 对这个页面的锁
   ReaderWriterLatch rwlatch_;
 };
 

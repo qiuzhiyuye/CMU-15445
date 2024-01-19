@@ -77,6 +77,8 @@ class ExtendibleHashTable : public HashTable<K, V> {
    */
   auto Find(const K &key, V &value) -> bool override;
 
+  // override 强制必须实现，防止忘记
+
   /**
    *
    * TODO(P1): Add implementation
@@ -163,6 +165,8 @@ class ExtendibleHashTable : public HashTable<K, V> {
     int depth_;
     std::list<std::pair<K, V>> list_;
   };
+
+  // bucket 结束
 
  private:
   // TODO(student): You may add additional private members and helper functions and remove the ones

@@ -14,6 +14,7 @@
 
 #include <limits>
 #include <list>
+#include <memory>
 #include <mutex>  // NOLINT
 #include <unordered_map>
 #include <vector>
@@ -33,6 +34,7 @@ namespace bustub {
  * A frame with less than k historical references is given
  * +inf as its backward k-distance. When multiple frames have +inf backward k-distance,
  * classical LRU algorithm is used to choose victim.
+ * 课程页面说的是用FIFO 这里是错的！！！,数据也是FIFO
  */
 class LRUKReplacer {
  public:
@@ -46,6 +48,7 @@ class LRUKReplacer {
   explicit LRUKReplacer(size_t num_frames, size_t k);
 
   DISALLOW_COPY_AND_MOVE(LRUKReplacer);
+  // ？宏定义了一堆，删除这个名字？是C++有自带的LRU-k吗？不懂
 
   /**
    * TODO(P1): Add implementation
@@ -132,14 +135,49 @@ class LRUKReplacer {
    */
   auto Size() -> size_t;
 
+  class Frame {
+   public:
+    frame_id_t frame_id_;
+    std::weak_ptr<Frame> pre_, nex_;
+    std::list<size_t> timestamps_;  // 记录时间戳序列,因为这里不可能无限制一直写下去
+    // 超过K个之后前面必须要清空，还可以记录一个record_cnt_ 记录被访问几次了
+    size_t record_cnt_{0};
+    // bool atwhere{false}; // 记录在哪个队列里面，false就在history队列，否则就是在LRU队列
+    bool evictable_{true};
+    Frame() = default;
+    explicit Frame(frame_id_t frame_id) : frame_id_(frame_id) {}
+  };
+
+  // 自己加的函数
+  void RemoveFromList(const std::shared_ptr<Frame> &frame_);  // 这里应该不需要区分在那个链表里面，只要移除了就行
+  void InsertToListHead(const std::shared_ptr<Frame> &frame_, const std::shared_ptr<Frame> &head);
+
  private:
   // TODO(student): implement me! You can replace these member variables as you like.
   // Remove maybe_unused if you start using them.
-  [[maybe_unused]] size_t current_timestamp_{0};
-  [[maybe_unused]] size_t curr_size_{0};
-  [[maybe_unused]] size_t replacer_size_;
-  [[maybe_unused]] size_t k_;
+  size_t current_timestamp_{0};
+  size_t curr_size_{0};
+  size_t replacer_size_;
+  size_t k_;
   std::mutex latch_;
-};
 
+  // 两个链表，一个记录history，使用次数，一个是 双向链表(手动模拟)+hashmap记录,模拟驱逐队列
+  std::shared_ptr<Frame> lru_head_, lru_tail_;          // LRU 链表
+  std::shared_ptr<Frame> history_head_, history_tail_;  // 历史记录，也就是不到k次的那些结点
+  // 两个链表都采用手动模拟形式，而且历史记录链表 也采用LRU算法驱逐，不用FIFO
+  // tail是最先被驱逐位置，头是新位置
+
+  // std::shared_ptr<Frame> L(new Frame());
+  // std::shared_ptr<int> test(new int(100));
+  // 这个直接用new出来的裸指针直接初始化不知道为什么在这里是报错的，所以选择了在另外一个文件里面
+  // 构造函数那里用makeshared初始化
+
+  size_t tot_size_{0};  // 本来这个感觉不用加，但是因为设置是否可以驱逐那里要求curr_size要变大小
+  // 这样，curr_size就是可以被驱逐大小的记录,那里的定义明确写着就是这个可以驱逐个数代表size
+  // 但是插入看有没有空是看两个链表除去哨兵结点的 大小和初始化分配Frame个数来比较的。
+  // 所以我tot_size_记录的是两个链表的全部大小。
+
+  std::unordered_map<frame_id_t, std::shared_ptr<Frame>> mp_;
+  // 页面和结点指针的映射关系，方便找到对应结点，类似于数组用的 node[id]
+};  // 总的来说，比LRU 项目多了，设置是否可以驱逐+ -k的实现
 }  // namespace bustub

@@ -142,23 +142,37 @@ class BufferPoolManagerInstance : public BufferPoolManager {
 
   /** Number of pages in the buffer pool. */
   const size_t pool_size_;
+  // 页面容量
+
   /** The next page id to be allocated  */
   std::atomic<page_id_t> next_page_id_ = 0;
+  // 原子的，保证这个变量读写原子性
+
   /** Bucket size for the extendible hash table */
   const size_t bucket_size_ = 4;
 
   /** Array of buffer pool pages. */
   Page *pages_;
+  // 页面数组，应该是已经已经有内容的部分合集， 区分于下面的空页框
+
   /** Pointer to the disk manager. */
   DiskManager *disk_manager_ __attribute__((__unused__));
+  // 表示该函数或变量可能不使用，这个属性可以避免编译器产生警告信息。!!!
+  // __attribute__((属性列表)) 指明函数或者变量的属性
+  // 这里不是说这个变量用不到，要用的，是告诉编译器的东西，可以无视
+
   /** Pointer to the log manager. Please ignore this for P1. */
   LogManager *log_manager_ __attribute__((__unused__));
   /** Page table for keeping track of buffer pool pages. */
   ExtendibleHashTable<page_id_t, frame_id_t> *page_table_;
+  // 实际页面和页框的映射关系，类比于手写的 hashmap 来用
+
   /** Replacer to find unpinned pages for replacement. */
   LRUKReplacer *replacer_;
   /** List of free frames that don't have any pages on them. */
   std::list<frame_id_t> free_list_;
+  // 空页框列表
+
   /** This latch protects shared data structures. We recommend updating this comment to describe what it protects. */
   std::mutex latch_;
 

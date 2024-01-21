@@ -49,7 +49,7 @@ auto LRUKReplacer::Evict(frame_id_t *frame_id) -> bool {  // 这里传参数是�
   // LOG_INFO("Evict");
   if (Size() == 0) {
     return false;
-  }  // 没有可以驱逐的frame，包括有些被锁上了不给驱逐
+  }  // 没有可以驱逐的frame，有些被锁上了不给驱逐，这里不算在内
 
   // 先驱逐history队列
   auto p = history_tail_->pre_.lock();

@@ -110,10 +110,10 @@ auto BufferPoolManagerInstance::FetchPgImp(page_id_t page_id) -> Page * {
   // 先判断一下页面号是否非法，其实应该不需要写
   // 我加了这大于等于下一个分配号的判断，要是页面那里修改了分配规则，这里需要修改！！！
   std::scoped_lock<std::mutex> lock(latch_);
-  if (page_id == INVALID_PAGE_ID || page_id >= next_page_id_) {
-    LOG_INFO("非法页面号！！！");
-    return nullptr;
-  }
+  // if (page_id == INVALID_PAGE_ID || page_id >= next_page_id_) {
+  //   LOG_INFO("非法页面号！！！");
+  //   return nullptr;
+  // }
   frame_id_t frame_id;
   if (!page_table_->Find(page_id, frame_id)) {  // 页框里面找不到页面,就去想办法找到一个页框
     if (!free_list_.empty()) {

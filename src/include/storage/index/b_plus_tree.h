@@ -74,6 +74,17 @@ class BPlusTree {
   // read data from file and remove one by one
   void RemoveFromFile(const std::string &file_name, Transaction *transaction = nullptr);
 
+  // 以下是自己加的
+  auto Findleaf(const KeyType &key) -> LeafPage *;  // 通过key找到对应的叶子结点
+
+  // 模板编程，这里是对函数的模板使用
+  // 和类的模板不同，类的模板在使用的时候要指定模板类型
+  // 但是函数的模板可以不用管，由编译器来定这个类型。所以后面用的时候，也不需要指定这里面的T
+  template <typename T>
+  auto Split(T *node) -> T *;
+
+  void InsertIntoParent(BPlusTreePage *old_node, const KeyType &key, BPlusTreePage *new_node, Transaction *transaction);
+
  private:
   void UpdateRootPageId(int insert_record = 0);
 
